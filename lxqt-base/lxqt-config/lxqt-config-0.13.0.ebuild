@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-inherit cmake-utils versionator
+inherit cmake-utils gnome2-utils versionator
 
 DESCRIPTION="LXQt system configuration control center"
 HOMEPAGE="http://lxqt.org/"
@@ -17,6 +17,7 @@ fi
 
 LICENSE="GPL-2 LGPL-2.1+"
 SLOT="0/$(get_version_component_range 2)"
+IUSE="+monitor"
 
 RDEPEND="
 	dev-libs/libqtxdg:0/3
@@ -28,7 +29,6 @@ RDEPEND="
 	dev-qt/qtx11extras:5=
 	dev-qt/qtxml:5=
 	kde-frameworks/kwindowsystem:5=
-	kde-plasma/libkscreen:5=
 	lxqt-base/liblxqt:0/$(get_version_component_range 2)
 	sys-libs/zlib:=
 	x11-apps/setxkbmap
@@ -39,15 +39,33 @@ RDEPEND="
 	x11-libs/libXcursor
 	x11-libs/libXext
 	x11-libs/libXfixes
+	monitor? (
+		kde-plasma/libkscreen:5=
+	)
 "
 DEPEND="${RDEPEND}
 	>=dev-util/lxqt-build-tools-0.5.0
 	dev-qt/linguist-tools:5
 "
 
-mycmakeargs=( -DPULL_TRANSLATIONS=OFF )
+src_configure() {
+	local mycmakeargs=(
+		-DPULL_TRANSLATIONS=OFF
+		-DWITH_MONITOR="$(usex monitor)"
+	)
 
-src_install(){
+	cmake-utils_src_configure
+}
+
+src_install() {
 	cmake-utils_src_install
 	doman man/*.1 liblxqt-config-cursor/man/*.1 lxqt-config-appearance/man/*.1
+}
+
+pkg_postinst() {
+	gnome2_icon_cache_update
+}
+
+pkg_postrm() {
+	gnome2_icon_cache_update
 }

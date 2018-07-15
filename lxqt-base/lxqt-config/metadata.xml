@@ -8,4 +8,7 @@
 	<upstream>
 		<remote-id type="github">lxde/lxqt-config</remote-id>
 	</upstream>
+	<use>
+		<flag name="monitor">Build monitor settings tool<flag>
+	</use>
 </pkgmetadata>
